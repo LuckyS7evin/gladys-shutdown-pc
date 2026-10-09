@@ -1,0 +1,24 @@
+# Changelog
+
+All notable changes to this integration are documented in this file. The format
+follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and the project
+uses [semantic versioning](https://semver.org/).
+
+Describe each change under `## [Unreleased]` as you make it. The Release
+workflow moves that section under the version it ships, and the section becomes
+the notes of the version's GitHub Release.
+
+## [Unreleased]
+
+### Added
+
+- Shut down Windows and Linux computers over SSH: one Gladys device with a
+  "Shut down" push button per computer.
+- Manage several computers from the Configuration screen: add, edit and test
+  a computer, show the integration's public key.
+- Authentication with the integration's own ed25519 key, or a password.
+- Host key pinning on the first successful connection.
+- "Shut down a computer" scene action, with a `success` output.
+- "Shutdown PC" dashboard widget: reachability status and a shutdown button
+  that asks for confirmation.
+- User documentation in French and English.

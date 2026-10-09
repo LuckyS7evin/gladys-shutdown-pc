@@ -1,0 +1,136 @@
+# Shutdown PC
+
+Éteignez vos ordinateurs **Windows** et **Linux** depuis Gladys : un bouton
+sur le tableau de bord, un widget dédié ou une action de scène (« éteindre
+le PC du bureau à 23 h », « tout éteindre quand je pars »…).
+
+L'intégration se connecte à l'ordinateur en **SSH** et lance la commande
+d'extinction. Pas de logiciel à installer : le serveur SSH est intégré à
+Windows 10 et 11 et disponible sur toutes les distributions Linux.
+
+## 1. Préparer l'ordinateur
+
+> Donnez une **adresse IP fixe** à l'ordinateur (réservation DHCP dans votre
+> box ou votre routeur) : l'intégration le contacte à cette adresse.
+
+### Windows 10 / 11
+
+Ouvrez **PowerShell en tant qu'administrateur** et lancez :
+
+```powershell
+# Installer et démarrer le serveur SSH, au démarrage de Windows aussi
+Add-WindowsCapability -Online -Name OpenSSH.Server~~~~0.0.1.0
+Start-Service sshd
+Set-Service -Name sshd -StartupType 'Automatic'
+
+# Vérifier que le pare-feu laisse passer le port 22 (créé à l'installation)
+Get-NetFirewallRule -Name *OpenSSH-Server* | Select-Object Name, Enabled
+```
+
+Utilisez un **compte administrateur** de l'ordinateur. Avec un compte
+Microsoft, l'utilisateur est le nom du dossier `C:\Users\<nom>` et le mot de
+passe est celui du compte Microsoft (pas le code PIN).
+
+### Linux
+
+```bash
+sudo apt install openssh-server   # ou l'équivalent de votre distribution
+```
+
+Sauf avec l'utilisateur `root`, autorisez l'utilisateur choisi (ici `jean`) à
+éteindre la machine **sans mot de passe**, et uniquement cela :
+
+```bash
+echo "jean ALL=(root) NOPASSWD: $(command -v systemctl) poweroff" | sudo tee /etc/sudoers.d/gladys-shutdown
+sudo chmod 440 /etc/sudoers.d/gladys-shutdown
+```
+
+## 2. Choisir l'authentification
+
+**Clé publique (recommandé).** L'intégration génère sa propre clé SSH.
+Cliquez sur **Afficher la clé publique** dans l'onglet Configuration, puis
+copiez la ligne `ssh-ed25519 … gladys-shutdown-pc` sur l'ordinateur. Aucun
+mot de passe de l'ordinateur n'est alors enregistré dans Gladys.
+
+- **Windows, compte administrateur** : la clé va dans un fichier commun à
+  tous les administrateurs, qui doit être protégé (PowerShell administrateur) :
+
+  ```powershell
+  Add-Content -Force -Path "$env:ProgramData\ssh\administrators_authorized_keys" -Value 'ssh-ed25519 AAAA… gladys-shutdown-pc'
+  icacls.exe "$env:ProgramData\ssh\administrators_authorized_keys" /inheritance:r /grant "*S-1-5-32-544:F" /grant "*S-1-5-18:F"
+  ```
+
+- **Linux** : ajoutez la ligne à `~/.ssh/authorized_keys` de l'utilisateur.
+
+**Mot de passe.** Renseignez simplement le mot de passe du compte en ajoutant
+l'ordinateur. Il est stocké dans le volume de données de l'intégration,
+lisible par elle seule, et n'est jamais renvoyé à l'interface. Si vous
+renseignez un mot de passe, la clé reste essayée en premier.
+
+## 3. Ajouter les ordinateurs
+
+Dans l'onglet **Configuration** de l'intégration :
+
+1. **Ajouter un ordinateur** : nom, adresse IP ou nom d'hôte, port SSH (22),
+   utilisateur, système, mot de passe facultatif. L'intégration enregistre
+   l'ordinateur puis teste aussitôt la connexion (sans l'éteindre) et affiche
+   le résultat.
+2. Ouvrez l'onglet **Découverte** et **créez** l'appareil dans une pièce.
+3. Recommencez pour chaque ordinateur.
+
+Options :
+
+- **Forcer la fermeture des applications** (Windows, activé par défaut) :
+  sans cette option, un document non enregistré peut bloquer l'extinction.
+- **Commande personnalisée** : remplace la commande par défaut, par exemple
+  `shutdown /h` pour la veille prolongée sous Windows, ou
+  `sudo -n systemctl suspend` sous Linux (avec la règle sudoers adaptée).
+
+Les autres boutons :
+
+- **Tester la connexion** : se connecte à l'ordinateur choisi et vérifie
+  les droits, sans l'éteindre. Sous Linux, il vérifie aussi la règle sudoers.
+- **Modifier un ordinateur** : ressaisissez toutes les valeurs. Laissez le mot
+  de passe vide pour conserver l'actuel, ou cochez **Supprimer le mot de
+  passe enregistré** pour passer à la clé seule. Pour renommer l'appareil,
+  faites-le dans Gladys.
+- **Supprimer un ordinateur** : supprimez son appareil dans Gladys,
+  l'intégration l'oublie aussitôt.
+
+Le réglage **Délai de connexion SSH** fixe combien de temps attendre un
+ordinateur (10 s par défaut).
+
+## 4. Éteindre
+
+- **Tableau de bord** : chaque ordinateur est un appareil avec un bouton
+  **Éteindre**, affiché dans le widget de sa pièce.
+- **Widget « Extinction PC »** : ajoutez-le au tableau de bord et choisissez
+  l'ordinateur dans ses réglages. Il indique si l'ordinateur est joignable et
+  propose un bouton **Éteindre** qui demande confirmation.
+- **Scènes** (catégorie **Intégrations**) : l'action **Éteindre un
+  ordinateur** renvoie `success` (vrai/faux), que les actions suivantes
+  peuvent tester. L'action standard « Contrôler des appareils » sur le bouton
+  de l'ordinateur fonctionne aussi.
+
+## Sécurité
+
+- À la première connexion réussie, l'intégration **mémorise l'empreinte de
+  la clé d'hôte** de l'ordinateur. Elle refusera ensuite de se connecter à une
+  machine qui présenterait une autre clé (usurpation d'adresse IP). Après une
+  réinstallation de l'ordinateur, utilisez **Modifier un ordinateur** pour lui
+  refaire confiance.
+- Ni les mots de passe ni la clé privée n'apparaissent dans les logs.
+
+## Dépannage
+
+| Message                         | Que faire                                                                                                                                    |
+| ------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------- |
+| _pas de réponse_                | L'ordinateur est éteint ou en veille, ou `sshd` n'est pas démarré (`Get-Service sshd`).                                                      |
+| _injoignable_                   | Vérifiez l'adresse IP, le port et le pare-feu de l'ordinateur.                                                                               |
+| _authentification refusée_      | Vérifiez l'utilisateur et le mot de passe, ou la clé publique et les droits du fichier `administrators_authorized_keys` (commande `icacls`). |
+| _sudo demande un mot de passe_  | Ajoutez la règle sudoers de l'étape 1.                                                                                                       |
+| _la clé d'hôte SSH a changé_    | L'ordinateur a été réinstallé ? Utilisez **Modifier un ordinateur**. Sinon, méfiance.                                                        |
+| _la commande a échoué (code 5)_ | « Accès refusé » sous Windows : utilisez un compte administrateur.                                                                           |
+
+Les logs de l'intégration (interface Gladys ou `docker logs`) donnent le
+détail de chaque tentative.

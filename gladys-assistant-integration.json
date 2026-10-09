@@ -1,0 +1,462 @@
+{
+  "manifest_version": 1,
+  "type": "device",
+  "name": "Shutdown PC",
+  "description": {
+    "en": "Shut down your Windows and Linux computers over SSH from a dashboard or a scene.",
+    "fr": "Éteignez vos ordinateurs Windows et Linux via SSH depuis un tableau de bord ou une scène."
+  },
+  "version": "1.0.0",
+  "docker_image": "ghcr.io/luckys7evin/gladys-shutdown-pc:1.0.0",
+  "gladys_version": ">=5.1.0",
+  "cover_image": "https://raw.githubusercontent.com/LuckyS7evin/gladys-shutdown-pc/main/cover.png",
+  "categories": ["network", "energy"],
+  "config_schema": [
+    {
+      "key": "intro",
+      "type": "section",
+      "label": {
+        "en": "Getting started",
+        "fr": "Pour commencer"
+      },
+      "description": {
+        "en": "Enable the SSH server on each computer (built into Windows 10 and 11), then add the computers with the buttons below and create them from the Discovery tab. Each computer becomes a device with a \"Shut down\" button.",
+        "fr": "Activez le serveur SSH sur chaque ordinateur (intégré à Windows 10 et 11), puis ajoutez les ordinateurs avec les boutons ci-dessous et créez-les depuis l'onglet Découverte. Chaque ordinateur devient un appareil avec un bouton « Éteindre »."
+      },
+      "links": [
+        {
+          "url": "https://learn.microsoft.com/windows-server/administration/openssh/openssh_install_firstuse",
+          "label": {
+            "en": "Install OpenSSH Server on Windows",
+            "fr": "Installer OpenSSH Server sous Windows"
+          }
+        }
+      ]
+    },
+    {
+      "key": "connect_timeout_seconds",
+      "type": "number",
+      "label": {
+        "en": "SSH connection timeout (s)",
+        "fr": "Délai de connexion SSH (s)"
+      },
+      "description": {
+        "en": "How long to wait for a computer before giving up.",
+        "fr": "Temps d'attente maximal d'un ordinateur avant abandon."
+      },
+      "placeholder": {
+        "en": "e.g. 10",
+        "fr": "ex. 10"
+      },
+      "required": false,
+      "default": 10,
+      "min": 3,
+      "max": 30
+    }
+  ],
+  "actions": [
+    {
+      "key": "show_public_key",
+      "label": {
+        "en": "Show the public key",
+        "fr": "Afficher la clé publique"
+      },
+      "description": {
+        "en": "The key to add to the authorized keys of each computer, to log in without a password.",
+        "fr": "La clé à ajouter aux clés autorisées de chaque ordinateur, pour se connecter sans mot de passe."
+      },
+      "timeout_seconds": 15
+    },
+    {
+      "key": "add_computer",
+      "label": {
+        "en": "Add a computer",
+        "fr": "Ajouter un ordinateur"
+      },
+      "description": {
+        "en": "Saves the computer, then tests the connection.",
+        "fr": "Enregistre l'ordinateur, puis teste la connexion."
+      },
+      "timeout_seconds": 60,
+      "fields": [
+        {
+          "key": "name",
+          "type": "string",
+          "label": {
+            "en": "Name",
+            "fr": "Nom"
+          },
+          "placeholder": {
+            "en": "e.g. Office PC",
+            "fr": "ex. PC du bureau"
+          },
+          "required": true
+        },
+        {
+          "key": "host",
+          "type": "string",
+          "label": {
+            "en": "Host name or IP address",
+            "fr": "Nom d'hôte ou adresse IP"
+          },
+          "placeholder": {
+            "en": "e.g. 192.168.1.20",
+            "fr": "ex. 192.168.1.20"
+          },
+          "required": true
+        },
+        {
+          "key": "port",
+          "type": "number",
+          "label": {
+            "en": "SSH port",
+            "fr": "Port SSH"
+          },
+          "required": true,
+          "default": 22,
+          "min": 1,
+          "max": 65535
+        },
+        {
+          "key": "username",
+          "type": "string",
+          "label": {
+            "en": "User",
+            "fr": "Utilisateur"
+          },
+          "description": {
+            "en": "An administrator account on Windows; on Linux, root or a user allowed to power off through sudo.",
+            "fr": "Un compte administrateur sous Windows ; sous Linux, root ou un utilisateur autorisé à éteindre via sudo."
+          },
+          "placeholder": {
+            "en": "e.g. john",
+            "fr": "ex. jean"
+          },
+          "required": true
+        },
+        {
+          "key": "os",
+          "type": "select",
+          "label": {
+            "en": "Operating system",
+            "fr": "Système d'exploitation"
+          },
+          "required": true,
+          "default": "windows",
+          "display": "radio",
+          "options": [
+            {
+              "value": "windows",
+              "label": {
+                "en": "Windows",
+                "fr": "Windows"
+              }
+            },
+            {
+              "value": "linux",
+              "label": {
+                "en": "Linux",
+                "fr": "Linux"
+              }
+            }
+          ]
+        },
+        {
+          "key": "password",
+          "type": "secret",
+          "label": {
+            "en": "Password (optional)",
+            "fr": "Mot de passe (facultatif)"
+          },
+          "description": {
+            "en": "Leave empty to log in with the integration's public key (recommended, see \"Show the public key\").",
+            "fr": "Laissez vide pour vous connecter avec la clé publique de l'intégration (recommandé, voir « Afficher la clé publique »)."
+          },
+          "required": false
+        },
+        {
+          "key": "force",
+          "type": "boolean",
+          "label": {
+            "en": "Force applications to close (Windows)",
+            "fr": "Forcer la fermeture des applications (Windows)"
+          },
+          "description": {
+            "en": "Otherwise an unsaved document can block the shutdown.",
+            "fr": "Sinon un document non enregistré peut bloquer l'extinction."
+          },
+          "required": false,
+          "default": true
+        },
+        {
+          "key": "custom_command",
+          "type": "string",
+          "label": {
+            "en": "Custom command (optional)",
+            "fr": "Commande personnalisée (facultatif)"
+          },
+          "description": {
+            "en": "Replaces the default shutdown command, e.g. to hibernate.",
+            "fr": "Remplace la commande d'extinction par défaut, par exemple pour mettre en veille prolongée."
+          },
+          "placeholder": {
+            "en": "e.g. shutdown /h",
+            "fr": "ex. shutdown /h"
+          },
+          "required": false
+        }
+      ]
+    },
+    {
+      "key": "update_computer",
+      "label": {
+        "en": "Edit a computer",
+        "fr": "Modifier un ordinateur"
+      },
+      "description": {
+        "en": "Enter all the values again. To remove a computer, delete its device in Gladys.",
+        "fr": "Saisissez à nouveau toutes les valeurs. Pour supprimer un ordinateur, supprimez son appareil dans Gladys."
+      },
+      "timeout_seconds": 60,
+      "fields": [
+        {
+          "key": "device",
+          "type": "select",
+          "source": "devices",
+          "label": {
+            "en": "Computer",
+            "fr": "Ordinateur"
+          },
+          "required": true
+        },
+        {
+          "key": "name",
+          "type": "string",
+          "label": {
+            "en": "Name",
+            "fr": "Nom"
+          },
+          "placeholder": {
+            "en": "e.g. Office PC",
+            "fr": "ex. PC du bureau"
+          },
+          "required": true
+        },
+        {
+          "key": "host",
+          "type": "string",
+          "label": {
+            "en": "Host name or IP address",
+            "fr": "Nom d'hôte ou adresse IP"
+          },
+          "placeholder": {
+            "en": "e.g. 192.168.1.20",
+            "fr": "ex. 192.168.1.20"
+          },
+          "required": true
+        },
+        {
+          "key": "port",
+          "type": "number",
+          "label": {
+            "en": "SSH port",
+            "fr": "Port SSH"
+          },
+          "required": true,
+          "default": 22,
+          "min": 1,
+          "max": 65535
+        },
+        {
+          "key": "username",
+          "type": "string",
+          "label": {
+            "en": "User",
+            "fr": "Utilisateur"
+          },
+          "description": {
+            "en": "An administrator account on Windows; on Linux, root or a user allowed to power off through sudo.",
+            "fr": "Un compte administrateur sous Windows ; sous Linux, root ou un utilisateur autorisé à éteindre via sudo."
+          },
+          "placeholder": {
+            "en": "e.g. john",
+            "fr": "ex. jean"
+          },
+          "required": true
+        },
+        {
+          "key": "os",
+          "type": "select",
+          "label": {
+            "en": "Operating system",
+            "fr": "Système d'exploitation"
+          },
+          "required": true,
+          "default": "windows",
+          "display": "radio",
+          "options": [
+            {
+              "value": "windows",
+              "label": {
+                "en": "Windows",
+                "fr": "Windows"
+              }
+            },
+            {
+              "value": "linux",
+              "label": {
+                "en": "Linux",
+                "fr": "Linux"
+              }
+            }
+          ]
+        },
+        {
+          "key": "password",
+          "type": "secret",
+          "label": {
+            "en": "Password (optional)",
+            "fr": "Mot de passe (facultatif)"
+          },
+          "description": {
+            "en": "Leave empty to keep the current password.",
+            "fr": "Laissez vide pour conserver le mot de passe actuel."
+          },
+          "required": false
+        },
+        {
+          "key": "clear_password",
+          "type": "boolean",
+          "label": {
+            "en": "Remove the stored password",
+            "fr": "Supprimer le mot de passe enregistré"
+          },
+          "description": {
+            "en": "Log in with the public key only from now on.",
+            "fr": "Se connecter uniquement avec la clé publique désormais."
+          },
+          "required": false,
+          "default": false
+        },
+        {
+          "key": "force",
+          "type": "boolean",
+          "label": {
+            "en": "Force applications to close (Windows)",
+            "fr": "Forcer la fermeture des applications (Windows)"
+          },
+          "description": {
+            "en": "Otherwise an unsaved document can block the shutdown.",
+            "fr": "Sinon un document non enregistré peut bloquer l'extinction."
+          },
+          "required": false,
+          "default": true
+        },
+        {
+          "key": "custom_command",
+          "type": "string",
+          "label": {
+            "en": "Custom command (optional)",
+            "fr": "Commande personnalisée (facultatif)"
+          },
+          "description": {
+            "en": "Replaces the default shutdown command, e.g. to hibernate.",
+            "fr": "Remplace la commande d'extinction par défaut, par exemple pour mettre en veille prolongée."
+          },
+          "placeholder": {
+            "en": "e.g. shutdown /h",
+            "fr": "ex. shutdown /h"
+          },
+          "required": false
+        }
+      ]
+    },
+    {
+      "key": "test_computer",
+      "label": {
+        "en": "Test the connection",
+        "fr": "Tester la connexion"
+      },
+      "description": {
+        "en": "Connects over SSH without shutting the computer down.",
+        "fr": "Se connecte en SSH sans éteindre l'ordinateur."
+      },
+      "timeout_seconds": 60,
+      "fields": [
+        {
+          "key": "device",
+          "type": "select",
+          "source": "devices",
+          "label": {
+            "en": "Computer",
+            "fr": "Ordinateur"
+          },
+          "required": true
+        }
+      ]
+    }
+  ],
+  "scene_actions": [
+    {
+      "key": "shutdown_computer",
+      "label": {
+        "en": "Shut down a computer",
+        "fr": "Éteindre un ordinateur"
+      },
+      "description": {
+        "en": "Sends the shutdown command to the computer over SSH.",
+        "fr": "Envoie la commande d'extinction à l'ordinateur via SSH."
+      },
+      "timeout_seconds": 60,
+      "fields": [
+        {
+          "key": "device",
+          "type": "select",
+          "source": "devices",
+          "label": {
+            "en": "Computer",
+            "fr": "Ordinateur"
+          },
+          "required": true
+        }
+      ],
+      "outputs": [
+        {
+          "key": "success",
+          "type": "boolean",
+          "label": {
+            "en": "Shutdown order accepted",
+            "fr": "Ordre d'extinction accepté"
+          }
+        }
+      ]
+    }
+  ],
+  "widgets": [
+    {
+      "key": "shutdown_pc",
+      "label": {
+        "en": "Shutdown PC",
+        "fr": "Extinction PC"
+      },
+      "description": {
+        "en": "A computer's status and a button to shut it down.",
+        "fr": "L'état d'un ordinateur et un bouton pour l'éteindre."
+      },
+      "icon": "power",
+      "action_timeout_seconds": 60,
+      "settings": [
+        {
+          "key": "device",
+          "type": "select",
+          "source": "devices",
+          "label": {
+            "en": "Computer",
+            "fr": "Ordinateur"
+          },
+          "required": true
+        }
+      ]
+    }
+  ]
+}

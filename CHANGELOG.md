@@ -10,6 +10,8 @@ the notes of the version's GitHub Release.
 
 ## [Unreleased]
 
+## [2.0.0] - 2026-10-19
+
 ### Added
 
 - Shut down Windows and Linux computers over SSH: one Gladys device with a
@@ -22,3 +24,6 @@ the notes of the version's GitHub Release.
 - "Shutdown PC" dashboard widget: reachability status and a shutdown button
   that asks for confirmation.
 - User documentation in French and English.
+
+[Unreleased]: https://github.com/LuckyS7evin/gladys-shutdown-pc/compare/v2.0.0...HEAD
+[2.0.0]: https://github.com/LuckyS7evin/gladys-shutdown-pc/releases/tag/v2.0.0

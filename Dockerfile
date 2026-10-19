@@ -15,9 +15,12 @@ RUN apk add --no-cache dumb-init
 
 WORKDIR /app
 
-# Install the PROD dependencies first (better build cache).
-COPY package.json package-lock.json* ./
-RUN npm ci --omit=dev || npm install --omit=dev
+# Install the PROD dependencies first (better build cache), exactly as locked:
+# no `npm install` fallback that would resolve other versions than the tested
+# ones. Optional deps are skipped: ssh2's native `cpu-features` cannot build on
+# Alpine without a toolchain, and ssh2 runs fine in pure JavaScript.
+COPY package.json package-lock.json ./
+RUN npm ci --omit=dev --omit=optional && npm cache clean --force
 
 # Then the integration code.
 COPY index.js ./

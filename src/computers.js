@@ -34,7 +34,11 @@ export class ValidationError extends Error {
 }
 
 const HOST_PATTERN = /^[A-Za-z0-9._:-]+$/;
-const USERNAME_PATTERN = /^[^\s"'`;|&<>$]+$/;
+// The user name only travels in the SSH protocol, never through a shell:
+// Windows local accounts may contain spaces ("Jean Dupont") or a domain
+// ("OFFICE\jean"). Only control characters are refused.
+// eslint-disable-next-line no-control-regex
+const USERNAME_PATTERN = /^[^\x00-\x1f\x7f]+$/;
 const MAX_TEXT_LENGTH = 255;
 
 function text(value) {

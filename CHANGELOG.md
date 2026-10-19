@@ -10,6 +10,16 @@ the notes of the version's GitHub Release.
 
 ## [Unreleased]
 
+### Fixed
+
+- A user name containing a space (a Windows local account such as
+  "Jean Dupont") or a domain ("OFFICE\jean") is now accepted.
+
+### Security
+
+- The Docker image installs exactly the locked dependencies, with no fallback
+  to an unlocked install.
+
 ## [2.0.0] - 2026-10-19
 
 ### Added

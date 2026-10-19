@@ -46,7 +46,7 @@ test('computerFromFields rejects invalid values with a bilingual message', () =>
     { ...WINDOWS_FIELDS, port: 70000 },
     { ...WINDOWS_FIELDS, port: 'abc' },
     { ...WINDOWS_FIELDS, username: '' },
-    { ...WINDOWS_FIELDS, username: 'john doe' },
+    { ...WINDOWS_FIELDS, username: 'john\ndoe' },
     { ...WINDOWS_FIELDS, os: 'macos' },
   ];
   for (const fields of invalid) {
@@ -57,6 +57,17 @@ test('computerFromFields rejects invalid values with a bilingual message', () =>
       JSON.stringify(fields),
     );
   }
+});
+
+test('computerFromFields accepts Windows user names with a space or a domain', () => {
+  // The user name travels in the SSH protocol only, never through a shell.
+  for (const username of ['Jean Dupont', 'OFFICE\\jean', 'jean@example.com']) {
+    assert.equal(computerFromFields({ ...WINDOWS_FIELDS, username }).username, username);
+  }
+  assert.equal(
+    computerFromFields({ ...WINDOWS_FIELDS, username: '  Jean Dupont ' }).username,
+    'Jean Dupont',
+  );
 });
 
 test('an update keeps the id and the password left blank, and drops the pinned host key', () => {

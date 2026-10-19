@@ -10,6 +10,8 @@ the notes of the version's GitHub Release.
 
 ## [Unreleased]
 
+## [2.0.1] - 2026-10-19
+
 ### Fixed
 
 - A user name containing a space (a Windows local account such as
@@ -35,5 +37,6 @@ the notes of the version's GitHub Release.
   that asks for confirmation.
 - User documentation in French and English.
 
-[Unreleased]: https://github.com/LuckyS7evin/gladys-shutdown-pc/compare/v2.0.0...HEAD
+[Unreleased]: https://github.com/LuckyS7evin/gladys-shutdown-pc/compare/v2.0.1...HEAD
+[2.0.1]: https://github.com/LuckyS7evin/gladys-shutdown-pc/compare/v2.0.0...v2.0.1
 [2.0.0]: https://github.com/LuckyS7evin/gladys-shutdown-pc/releases/tag/v2.0.0

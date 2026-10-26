@@ -1,6 +1,6 @@
 {
   "name": "gladys-shutdown-pc",
-  "version": "2.0.1",
+  "version": "2.0.2",
   "private": true,
   "description": "Gladys Assistant external integration: shut down Windows and Linux computers over SSH.",
   "type": "module",

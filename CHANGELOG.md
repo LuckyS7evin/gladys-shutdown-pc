@@ -10,6 +10,8 @@ the notes of the version's GitHub Release.
 
 ## [Unreleased]
 
+## [2.0.2] - 2026-10-26
+
 ### Fixed
 
 - The operating system of a computer can now be chosen in the "Add a
@@ -44,6 +46,7 @@ the notes of the version's GitHub Release.
   that asks for confirmation.
 - User documentation in French and English.
 
-[Unreleased]: https://github.com/LuckyS7evin/gladys-shutdown-pc/compare/v2.0.1...HEAD
+[Unreleased]: https://github.com/LuckyS7evin/gladys-shutdown-pc/compare/v2.0.2...HEAD
+[2.0.2]: https://github.com/LuckyS7evin/gladys-shutdown-pc/compare/v2.0.1...v2.0.2
 [2.0.1]: https://github.com/LuckyS7evin/gladys-shutdown-pc/compare/v2.0.0...v2.0.1
 [2.0.0]: https://github.com/LuckyS7evin/gladys-shutdown-pc/releases/tag/v2.0.0

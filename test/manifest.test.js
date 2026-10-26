@@ -213,3 +213,23 @@ test('the computer forms of add_computer and update_computer stay in sync', () =
     'update_computer only adds the computer select and the password reset',
   );
 });
+
+test('a radio field never shares its key with a field of another action form', () => {
+  // The Gladys Configuration screen renders every action form on one page and
+  // names each input after its key only (no per-action prefix): two radio
+  // fields with the same key end up in ONE browser radio group, and each form
+  // re-checks its own value, so the user cannot pick an option at all.
+  const actions = manifest.actions ?? [];
+  for (const action of actions) {
+    for (const field of (action.fields ?? []).filter((f) => f.display === 'radio')) {
+      const others = actions.filter(
+        (other) => other !== action && (other.fields ?? []).some((f) => f.key === field.key),
+      );
+      assert.deepEqual(
+        others.map((other) => other.key),
+        [],
+        `radio field "${field.key}" of "${action.key}" collides with other action forms`,
+      );
+    }
+  }
+});

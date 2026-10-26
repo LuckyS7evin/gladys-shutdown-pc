@@ -10,6 +10,13 @@ the notes of the version's GitHub Release.
 
 ## [Unreleased]
 
+### Fixed
+
+- The operating system of a computer can now be chosen in the "Add a
+  computer" and "Edit a computer" forms: the Windows / Linux radio buttons of
+  both forms shared one group in Gladys and could not be checked. It is now a
+  drop-down list.
+
 ## [2.0.1] - 2026-10-19
 
 ### Fixed

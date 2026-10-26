@@ -143,7 +143,6 @@
           },
           "required": true,
           "default": "windows",
-          "display": "radio",
           "options": [
             {
               "value": "windows",
@@ -293,7 +292,6 @@
           },
           "required": true,
           "default": "windows",
-          "display": "radio",
           "options": [
             {
               "value": "windows",

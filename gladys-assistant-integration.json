@@ -11,6 +11,7 @@
   "gladys_version": ">=5.1.0",
   "cover_image": "https://raw.githubusercontent.com/LuckyS7evin/gladys-shutdown-pc/main/cover.png",
   "categories": ["network", "energy"],
+  "transports": ["local"],
   "config_schema": [
     {
       "key": "intro",

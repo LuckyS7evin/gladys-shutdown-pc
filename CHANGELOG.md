@@ -10,6 +10,11 @@ the notes of the version's GitHub Release.
 
 ## [Unreleased]
 
+### Changed
+
+- Declared `transports: ["local"]` (SSH on the local network): the Local filter
+  of the Gladys catalog now finds the integration.
+
 ## [2.0.2] - 2026-10-26
 
 ### Fixed
